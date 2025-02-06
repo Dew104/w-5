@@ -1,21 +1,20 @@
 const e = require('express')
 const express = require('express')
 const app = express()
-const port = 5000
+const port = 3000
 app.use(express.json())
 
 let std = [
-    { id: 1, name: "Chisanuphong"},
-    { id: 2, name: "Pongpan"},
+    { id: 1, name: "Pongpan"},
+    { id: 2, name: "Chisanuphong"},
     { id: 3, name: "Siwat"},
 ]
 
-app.get('/',(req , res) => res.send('Hello'))
 app.get('/std', (req , res) => res.json(std))
 app.get("/std/:id" , (req , res) => {
     let data = std.find(i => i.id == req.params.id)
     if (data != undefined) res.json(data)
-    else res.json({ massage: "can't find" })
+    else res.json({ massage: "not found" })
  })
 
  app.post('/std', (req , res) => {
@@ -26,7 +25,7 @@ app.get("/std/:id" , (req , res) => {
  })
 app.put('/std/:id', (req , res)=> {
     let data = std.find(i => i.id == req.params.id)
-    if (data == undefined) res.json('Not found you idiot')
+    if (data == undefined) res.json('Not found')
     else data.name = req.body.name
     std.map((i) => {
         if (i.id == data.id) i.name = data.name
@@ -42,22 +41,26 @@ app.listen(port, () => {
 })
 
 let todos = [
-    { id: 1, task: 'Buy groceries', completed: false },
-    { id: 2, task: 'Finish homework', completed: true },
-    { id: 3, task: 'Clean the house', completed: false },
-    { id: 4, task: 'Workout', completed: true },
-    { id: 5, task: 'Read a book', completed: false }
+    { id: 1, task: "ทำการบ้าน", completed: false },
+    { id: 2, task: "ออกกำลังกาย", completed: true },
+    { id: 3, task: "อ่านหนังสือ", completed: false },
+    { id: 4, task: "ทำอาหาร", completed: true },
+    { id: 5, task: "ซักผ้า", completed: false },
+    { id: 6, task: "ไปซื้อของ", completed: true },
+    { id: 7, task: "ทำความสะอาดบ้าน", completed: false },
+    { id: 8, task: "เขียนโปรแกรม", completed: true },
+    { id: 9, task: "ดูซีรีส์", completed: false },
+    { id: 10, task: "นั่งสมาธิ", completed: true }
 ];
-
 app.get('/todos', (req, res) => {
     res.json(todos);
 });
 
-// app.get("/todos/:id" , (req , res) => {
-//     let data = todos.find(i => i.id == req.params.id)
-//     if (data != undefined) res.json(data)
-//     else res.json({ massage: "ไม่พบบันทึกงานที่ระบุ" })
-//  })
+app.get("/todos/:id" , (req , res) => {
+    let data = todos.find(i => i.id == req.params.id)
+    if (data != undefined) res.json(data)
+    else res.json({ massage: "ไม่พบบันทึกงานที่ระบุ" })
+ })
 
  app.post('/todos', (req , res) => {
     let todosID = todos[todos.length - 1].id +1
@@ -86,48 +89,37 @@ app.put('/todos/:id/status', (req , res)=> {
     res.json(todos)
 })
 
-// app.delete('/todos/:id', (req , res)=> {
-//     todos = todos.filter(i => i.id != req.params.id)
-//     res.json(todos)
+app.delete('/todos/:id', (req , res)=> {
+    todos = todos.filter(i => i.id != req.params.id)
+    res.json(todos)
 
-//     if (todos.length === beforeDelete) {
-//         res.json({ message: "ไม่พบบันทึกงานที่ระบุ" })
-//     } else {
-//         res.json({ message: "ลบงานสำเร็จ" })
-//     }
-// })
+    if (todos.length === beforeDelete) {
+        res.json({ message: "ไม่พบบันทึกงานที่ระบุ" })
+    } else {
+        res.json({ message: "ลบงานสำเร็จ" })
+    }
+})
 
-// app.get("/todos/completed", (req, res) => {
-//     let data = todos.filter(i => i.completed === true)
-//     if (data != undefined) res.json(data)
-//     else res.json({ massage: "ไม่พบบันทึกงานที่ระบุ" })
-//  })
+app.get("/todos/completed", (req, res) => {
+    let data = todos.filter(i => i.completed === true)
+    if (data != undefined) res.json(data)
+    else res.json({ massage: "ไม่พบบันทึกงานที่ระบุ" })
+ })
 
-// app.get("/todos/pending", (req, res) => {
-//     let data = todos.filter(i => i.completed === false)
-//     if (data != undefined) res.json(data)
-//     else res.json({ massage: "ไม่พบบันทึกงานที่ระบุ" })
-//  })
- 
- app.delete('/todos/completed', (req, res) => {
+ app.get("/todos/pending", (req, res) => {
+    let data = todos.filter(i => i.completed === false)
+    if (data != undefined) res.json(data)
+    else res.json({ massage: "ไม่พบบันทึกงานที่ระบุ" })
+ })
+
+app.delete('/todos/completed', (req, res) => {
     let beforeDelete = todos.length
     todos = todos.filter(i => i.completed === false)
     let afterDelete = todos.length
-    res.json({ message: "ลบงานที่เสร็จสิ้นทั้งหมดแล้ว", todos })
-    
-});
+    res.json({ message: "ลบงานที่เสร็จแล้วทั้งหมดสำเร็จ", todos })
+})
 
 app.get("/todos/search", (req, res) => {
-    const query = req.query.query;
-
-    if (!query) {
-        return res.json({ message: "กรุณาระบุคำค้นหา" })
-    }
-    let data = todos.filter(i => i.task.includes(query))
-
-    if (data.length > 0) {
-        res.json(data)
-    } else {
-        res.json({ message: "ไม่พบงานที่ตรงกับคำค้นหา" })
-    }
+    let data = todos.filter(i => i.task.includes(req.query.query));
+    res.json(data.length ? data : { message: "ไม่พบงานที่ตรงกับคำค้นหา" });
 });
